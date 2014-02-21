@@ -1,10 +1,13 @@
 function timedRefresh(timeout) {
     setTimeout("location.reload(true);", timeout * 60000);
     // minutes
-    drawGraph();
+    drawGraph(1);
+    drawGraph(2);
+    drawGraph(3);
+    drawGraph(4);
 }
 
-function drawGraph() {
+function drawGraph(id) {
 
     var lightData = new Array();
     var label = new Array();
@@ -12,12 +15,14 @@ function drawGraph() {
     $.ajax({
         url: 'fetchData.php',
         dataType: 'json',
+        data: {'id':id},
+        type: 'post',
         success: function(data) {
             var i = 0;
             for (row in data) {
-                //document.write(data[row].timestamp+" "+data[row].value+"<br>");
-                lightData[i] = data[row].value;
-                label[i] = data[row].timestamp;
+                //document.write(data[row].time+" "+data[row].value+"<br>");
+                lightData[i] = parseFloat(data[row].value);
+                label[i] = data[row].time;
                 i++;
             }
             var lineChartData = {
@@ -29,8 +34,11 @@ function drawGraph() {
                     data: lightData
                 }, ]
 
-                }
-            var myLine = new Chart(document.getElementById("canvas").getContext("2d")).Line(lineChartData);
+                };
+            var options ={
+                            bezierCurve : false,
+            };
+            var myLine = new Chart(document.getElementById("canvas"+id.toString()).getContext("2d")).Line(lineChartData, options);
 
         }
     });
